@@ -13,6 +13,7 @@ import { Input } from "@/components/Input";
 import { Button } from "@/components/Button";
 import { useNavigation } from "@react-navigation/native";
 import { AuthNavigatorRoutesProps } from "@/routes/auth.routes";
+import { useState } from "react";
 
 export function SignUp() {
   const navigate = useNavigation<AuthNavigatorRoutesProps>();
