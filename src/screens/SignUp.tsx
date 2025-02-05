@@ -17,14 +17,36 @@ import { Button } from "@/components/Button";
 import { useNavigation } from "@react-navigation/native";
 import { AuthNavigatorRoutesProps } from "@/routes/auth.routes";
 
+type FormDataProps = {
+  name: string;
+  email: string;
+  password: string;
+  password_confirm: string;
+};
+
 export function SignUp() {
   const navigate = useNavigation<AuthNavigatorRoutesProps>();
 
-  const { control, handleSubmit } = useForm();
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormDataProps>({
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      password_confirm: "",
+    },
+  });
 
-  function handleOnSubmit(e) {
-    console.log(e);
-    console.log("oxi");
+  function handleOnSubmit({
+    name,
+    email,
+    password,
+    password_confirm,
+  }: FormDataProps) {
+    console.log({ name, email, password, password_confirm });
   }
 
   return (
@@ -54,21 +76,34 @@ export function SignUp() {
           <Center gap="$2" flex={1}>
             <Heading color="$gray100">Crie sua conta</Heading>
 
+            {errors.name?.message && (
+              <Text color="$red500">{errors.name.message}</Text>
+            )}
             <Controller
               control={control}
               name="name"
+              rules={{
+                required: "Por favor, preencha o nome",
+              }}
               render={({ field: { onChange, value } }) => (
                 <Input
                   placeholder="Nome"
                   onChangeText={onChange}
                   value={value}
+                  isInvalid={errors.name?.message}
                 />
               )}
             />
 
+            {errors.email?.message && (
+              <Text color="$red500">{errors.email.message}</Text>
+            )}
             <Controller
               name="email"
               control={control}
+              rules={{
+                required: "Por favor, preencha o e-mail",
+              }}
               render={({ field: { onChange, value } }) => (
                 <Input
                   placeholder="E-mail"
@@ -76,26 +111,40 @@ export function SignUp() {
                   autoCapitalize="none"
                   onChangeText={onChange}
                   value={value}
+                  isInvalid={errors.email?.message}
                 />
               )}
             />
 
+            {errors.password?.message && (
+              <Text color="$red500">{errors.password.message}</Text>
+            )}
             <Controller
               name="password"
               control={control}
+              rules={{
+                required: "Por favor, digite uma senha",
+              }}
               render={({ field: { onChange, value } }) => (
                 <Input
                   placeholder="Senha"
                   secureTextEntry
                   onChangeText={onChange}
                   value={value}
+                  isInvalid={errors.password?.message}
                 />
               )}
             />
 
+            {errors.password_confirm?.message && (
+              <Text color="$red500">{errors.password_confirm.message}</Text>
+            )}
             <Controller
-              name="confirmPassword"
+              name="password_confirm"
               control={control}
+              rules={{
+                required: "Por favor, confirme a sua senha",
+              }}
               render={({ field: { onChange, value } }) => (
                 <Input
                   placeholder="Confirme a senha"
@@ -104,6 +153,7 @@ export function SignUp() {
                   value={value}
                   onSubmitEditing={handleSubmit(handleOnSubmit)}
                   returnKeyType="send"
+                  isInvalid={errors.password_confirm?.message}
                 />
               )}
             />
