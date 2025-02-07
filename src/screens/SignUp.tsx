@@ -6,17 +6,23 @@ import {
   Heading,
   ScrollView,
   onChange,
+  useToast,
 } from "@gluestack-ui/themed";
 
 import { useForm, Controller } from "react-hook-form";
 
 import backgroundImg from "@/assets/background.png";
 import Logo from "@/assets/logo.svg";
+
 import { Input } from "@/components/Input";
 import { Button } from "@/components/Button";
 import { useNavigation } from "@react-navigation/native";
 import { AuthNavigatorRoutesProps } from "@/routes/auth.routes";
 
+import { api } from "@/service/api";
+import { Alert } from "react-native";
+import { AppError } from "@/utils/AppError";
+import { ToastMessage } from "@/components/ToastMessage";
 type FormDataProps = {
   name: string;
   email: string;
@@ -26,6 +32,8 @@ type FormDataProps = {
 
 export function SignUp() {
   const navigate = useNavigation<AuthNavigatorRoutesProps>();
+
+  const toast = useToast();
 
   const {
     control,
@@ -40,13 +48,37 @@ export function SignUp() {
     },
   });
 
-  function handleOnSubmit({
+  async function handleOnSubmit({
     name,
     email,
     password,
     password_confirm,
   }: FormDataProps) {
-    console.log({ name, email, password, password_confirm });
+    try {
+      const response = await api.post("/users", {
+        name,
+        email,
+        password,
+      });
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+      const titulo = isAppError
+        ? error.message
+        : "Não foi possível criar a conta. Tente novamente mais tarde";
+
+      return toast.show({
+        placement: "bottom",
+        render: ({ id }) => (
+          <ToastMessage
+            id={id}
+            title="ERRO"
+            action="error"
+            description={titulo}
+            onClose={() => toast.close(id)}
+          />
+        ),
+      });
+    }
   }
 
   return (
